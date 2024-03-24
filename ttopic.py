@@ -9,7 +9,7 @@ async def main():
     # Connect to group
     await group.connect()
 
-    # Get your Topics
+    # Get your Topics list
     list_of_topics = await group.forum_topics()
     while True:
         index = input(f"Choose which topic you want to download (0-{len(list_of_topics) - 1}): ")
@@ -18,8 +18,7 @@ async def main():
             if 0 <= topic_index <= len(list_of_topics) - 1:
                 break
 
-    download_topic = list_of_topics[topic_index]
-    topic_id, topic_title = download_topic
+    topic_id, topic_title = list_of_topics[topic_index]
     media_list = await group.topic(topic_id, topic_title)
     input(f"\n[DOWNLOAD TOPIC PHOTO '{topic_title}'] - Press enter to continue")
     await group.telegram.downloader(media_list)
