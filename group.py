@@ -3,7 +3,7 @@
 import asyncio
 from mytelegram import MyTelegram
 from mymedia import MyMedia
-from telethon import functions
+from telethon import functions, errors
 
 
 class Group:
@@ -48,14 +48,19 @@ class Group:
         :return: list of topics
         """
 
-        result = await self.telegram.client(functions.channels.GetForumTopicsRequest(
-            channel=self.telegram.channel, # channel entity
-            offset_date=None,
-            offset_id=0,
-            offset_topic=0,
-            limit=0,
-            q=None
-        ))
+        try:
+            result = await self.telegram.client(functions.channels.GetForumTopicsRequest(
+                channel=self.telegram.channel, # channel entity
+                offset_date=None,
+                offset_id=0,
+                offset_topic=0,
+                limit=0,
+                q=None
+            ))
+        except errors.ChannelForumMissingError:
+            print("No topics found.")
+            return []
+
 
         print(".:LIST OF TOPICS:.")
         topic_ids = [[topic.id, topic.title] for topic in result.topics]
