@@ -11,17 +11,18 @@ async def main():
 
     # Get your Topics list
     list_of_topics = await group.forum_topics()
-    while True:
-        index = input(f"Choose which topic you want to download (0-{len(list_of_topics) - 1}): ")
-        if index.isnumeric():
-            topic_index = int(index)
-            if 0 <= topic_index <= len(list_of_topics) - 1:
-                break
+    if list_of_topics:
+        while True:
+            index = input(f"Choose which topic you want to download (0-{len(list_of_topics) - 1}): ")
+            if index.isnumeric():
+                topic_index = int(index)
+                if 0 <= topic_index <= len(list_of_topics) - 1:
+                    break
 
-    topic_id, topic_title = list_of_topics[topic_index]
-    media_list = await group.topic(topic_id, topic_title)
-    input(f"\n[DOWNLOAD TOPIC PHOTO '{topic_title}'] - Press enter to continue")
-    await group.telegram.downloader(media_list)
+        topic_id, topic_title = list_of_topics[topic_index]
+        media_list = await group.topic(topic_id, topic_title)
+        input(f"\n[DOWNLOAD TOPIC PHOTO '{topic_title}'] - Press enter to continue")
+        await group.telegram.downloader(media_list)
 
     loop.stop()
 
