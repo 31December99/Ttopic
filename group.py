@@ -29,23 +29,22 @@ class Group:
                                                                  limit=None, reverse=True, wait_time=1,
                                                                  reply_to=topic_id):
             if not message.sticker:
-                if message.reply_to:
-                    # Search
-                    if message.photo:
-                        self.media = MyMedia()
-                        self.media.msgid = message.id
+                # Search
+                if message.photo:
+                    self.media = MyMedia()
+                    self.media.msgid = message.id
 
-                        # Converting a timestamp to a datetime object
-                        message_time = datetime.fromtimestamp(message.date.timestamp())
+                    # Converting a timestamp to a datetime object
+                    message_time = datetime.fromtimestamp(message.date.timestamp())
 
-                        # Formatting the time into a string with the usual format
-                        formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
+                    # Formatting the time into a string with the usual format
+                    formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
 
-                        # Setting the file name using the usual time format
-                        self.media.title = f"{formatted_time}_{message.id}.jpg"
+                    # Setting the file name using the usual time format
+                    self.media.title = f"{formatted_time}_{message.id}.jpg"
 
-                        media_raw.append(self.media)
-                        print(f"[Found Photo {message.id} in {topic_title}] --> {self.media.title}")
+                    media_raw.append(self.media)
+                    print(f"[Found Photo {message.id} in {topic_title}] --> {self.media.title}")
 
         media_list = [media for media in media_raw if media.msgid]
         return media_list
