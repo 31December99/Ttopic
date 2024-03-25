@@ -6,6 +6,7 @@ from mymedia import MyMedia
 from telethon import functions, errors
 from datetime import datetime
 
+
 class Group:
 
     def __init__(self):
@@ -56,20 +57,19 @@ class Group:
         :param topic_id: topic ID
         :return: list of topics
         """
-
         try:
             result = await self.telegram.client(functions.channels.GetForumTopicsRequest(
-                channel=self.telegram.channel, # channel entity
+                channel=self.telegram.channel,  # channel entity
                 offset_date=None,
                 offset_id=0,
                 offset_topic=0,
-                limit=0,
+                limit=50,  # Hardcoded see pagination - https://core.telegram.org/api/offsets
                 q=None
             ))
+
         except errors.ChannelForumMissingError:
             print("No topics found.")
             return []
-
 
         print(".:LIST OF TOPICS:.")
         topic_ids = [[topic.id, topic.title] for topic in result.topics]
