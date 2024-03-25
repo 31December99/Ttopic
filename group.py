@@ -4,7 +4,7 @@ import asyncio
 from mytelegram import MyTelegram
 from mymedia import MyMedia
 from telethon import functions, errors
-
+from datetime import datetime
 
 class Group:
 
@@ -33,7 +33,16 @@ class Group:
                     if message.photo:
                         self.media = MyMedia()
                         self.media.msgid = message.id
-                        self.media.title = message.date.strftime("%Y-%m-%d %H-%M-%S")
+
+                        # Converting a timestamp to a datetime object
+                        message_time = datetime.fromtimestamp(message.date.timestamp())
+
+                        # Formatting the time into a string with the usual format
+                        formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
+
+                        # Setting the file name using the usual time format
+                        self.media.title = f"{formatted_time}_{message.id}.jpg"
+
                         media_raw.append(self.media)
                         print(f"[Found Photo {message.id} in {topic_title}] --> {self.media.title}")
 
