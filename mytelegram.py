@@ -89,21 +89,21 @@ class MyTelegram:
     async def worker(self, queue):
         while True:
             queue_item = await queue.get()
-            msgbody, path_dir, title = queue_item[:3]
+            msgbody, directory, title = queue_item[:3]
             current_time = datetime.now().strftime('%H:%M')
+            filename = os.path.join(directory, title)
             if msgbody is not None:
                 try:
-                    # path_dir not used
-                    print(f"[{current_time}] Download -> [{title}]")
-                    await self.takeout.download_media(msgbody, title)
+                    print(f"[{current_time}] Download -> [{filename}]")
+                    await self.takeout.download_media(msgbody, filename)
                 except errors.FileReferenceExpiredError:
-                    print(f"[{current_time}] §Expired§ => {title} ")
-                    await self.delete_file(title)
+                    print(f"[{current_time}] §Expired§ => {filename} ")
+                    await self.delete_file(filename)
                 except errors.TimeoutError:
-                    print(f"[{current_time}] §Incomplete§ => {title} ")
-                    await self.delete_file(title)
+                    print(f"[{current_time}] §Incomplete§ => {filename} ")
+                    await self.delete_file(filename)
                 else:
-                    print(f"[{current_time}] Completed ! {title} ")
+                    print(f"[{current_time}] Completed ! {filename} ")
                 finally:
                     # Chiudi e decrementa la coda di 1 con task_done()
                     queue.task_done()
@@ -113,13 +113,20 @@ class MyTelegram:
                 queue.task_done()
 
     async def downloader(self, media_list):
+        # We ask the user to enter the path to the directory
+        directory = input("Введите путь к директории для сохранения файлов: ")
+        # Check if the specified directory exists
+        if not os.path.exists(directory):
+            print("Указанная директория не существует.")
+            return
+
         # Prepara i workers
         print("...Starting download...")
         queue = asyncio.Queue(1)
         workers = [asyncio.create_task(self.worker(queue)) for _ in range(self.WORKERS)]
         for media in media_list:
             async for messg in self.takeout.iter_messages(self.channel.channel_id, wait_time=1, ids=int(media.msgid)):
-                await queue.put((messg, ".", f'{str(media.title)}_{media.msgid}'))
+                await queue.put((messg, directory, f'{str(media.title)}_{media.msgid}'))
         await queue.join()
         # Cleaning
         for active_workers in workers:
