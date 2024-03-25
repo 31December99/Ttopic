@@ -71,7 +71,7 @@ class MyTelegram:
                 await self.__client.sign_in(phone=self.PHONE, code=int(input('Enter code: ')))
             except SessionPasswordNeededError:
                 # if a password is set
-                password = input("Put your password: ")
+                password = input("Enter your password: ")
                 await self.__client.sign_in(password=password)
 
         # Get a takeout instance
@@ -81,8 +81,8 @@ class MyTelegram:
                 self.__takeout = conn
                 print(f"Connected...")
         except errors.TakeoutInitDelayError:
-            print("step1 > Confirm auth telegram channel  (+42777)")
-            print("step2 > Restart app")
+            print("Step 1 > Confirm authentication in the Telegram channel (+42777)")
+            print("Step 2 > Restart the application")
         except errors.InviteHashExpiredError as err:
             print("Wrong or invalid link!", err)
 
@@ -113,11 +113,11 @@ class MyTelegram:
                 queue.task_done()
 
     async def downloader(self, media_list):
-        # We ask the user to enter the path to the directory
-        directory = input("Введите путь к директории для сохранения файлов: ")
+        # Ask the user to enter the path to the directory
+        directory = input("Enter the path to the directory to save files: ")
         # Check if the specified directory exists
         if not os.path.exists(directory):
-            print("Указанная директория не существует.")
+            print("Specified directory does not exist.")
             return
 
         # Prepara i workers
