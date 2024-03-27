@@ -23,43 +23,32 @@ class Group:
          Select a topic and add each photo to the media_list
         :return:
         """
-        media_raw = []
-        last_message_id = 0
-        last_chat_message_id = 0
-        async for message in self.telegram.takeout.iter_messages(self.telegram.channel.channel_id,
-                                                                 limit=1,
-                                                                 reverse=False,
-                                                                 wait_time=1):
-            last_chat_message_id = message.id
+        media_raw,media_list = [],[]
+        cont = 0
+        async for message in self.telegram.client.iter_messages(self.telegram.channel.channel_id,
+                                                                limit=None,
+                                                                reverse=True,
+                                                                wait_time=1,
+                                                                reply_to=topic_id,
+                                                                min_id=0,
+                                                                max_id=0):
+            cont += 1
+            if not message.sticker:
+                # Search
+                if message.photo:
+                    self.media = MyMedia()
+                    self.media.msgid = message.id
+                    # Converting a timestamp to a datetime object
+                    message_time = datetime.fromtimestamp(message.date.timestamp())
+                    # Formatting the time into a string with the usual format
+                    formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
+                    # Setting the file name using the usual time format
+                    self.media.title = f"{formatted_time}_{message.id}.jpg"
+                    media_raw.append(self.media)
+                    print(f"{[message.id]}[Found Photo n°{cont} in {topic_title}] --> {self.media.title}")
 
-        while True:
-            async for message in self.telegram.client.iter_messages(self.telegram.channel.channel_id,
-                                                                     limit=None,
-                                                                     reverse=True,
-                                                                     wait_time=1,
-                                                                     reply_to=topic_id,
-                                                                     min_id=last_message_id,
-                                                                     max_id=0):
-                if last_chat_message_id == message.id:
-                    break
-
-                if not message.sticker:
-                    # Search
-                    if message.photo:
-                        self.media = MyMedia()
-                        self.media.msgid = message.id
-                        # Converting a timestamp to a datetime object
-                        message_time = datetime.fromtimestamp(message.date.timestamp())
-                        # Formatting the time into a string with the usual format
-                        formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
-                        # Setting the file name using the usual time format
-                        self.media.title = f"{formatted_time}_{message.id}.jpg"
-                        media_raw.append(self.media)
-                        print(
-                            f"[Found Photo {message.id} in {topic_title}] --> {self.media.title} {last_chat_message_id}")
-
-            media_list = [media for media in media_raw if media.msgid]
-            return media_list
+        media_list = [media for media in media_raw if media.msgid]
+        return media_list
 
     async def forum_topics(self) -> list:
         """
