@@ -57,8 +57,8 @@ class Group:
                         self.media.title = f"{formatted_time}_{message.id}.jpg"
                         print(self.media.title)
 
-                # Photo album or single phot
-                if message.grouped_id or message.photo:
+                # Photo album or single photo not file
+                if (message.grouped_id or message.photo) and not hasattr(message.media, 'document'):
                     self.media.msgid = message.id
                     self.media_raw.append(self.media)
                     self.media.title = f"{formatted_time}_{message.id}.jpg"
@@ -81,7 +81,7 @@ class Group:
                 offset_date=None,
                 offset_id=0,
                 offset_topic=0,
-                limit=50,  # Hardcoded see pagination - https://core.telegram.org/api/offsets
+                limit=100,  # Hardcoded see pagination - https://core.telegram.org/api/offsets
                 q=None
             ))
 
