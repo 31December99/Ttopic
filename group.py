@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import asyncio
 from mytelegram import MyTelegram
 from mymedia import MyMedia
 from telethon import functions, errors
 from datetime import datetime
+
+class Album:
+
+    def __init__(self, topic_id: int, grouped_id: int):
+        self.grouped_id = grouped_id
+        self.topic_id = topic_id
 
 
 class Group:
 
     def __init__(self):
         self.telegram = MyTelegram()
+        self.media_raw = []
         self.media = None
 
     async def connect(self):
@@ -23,8 +29,8 @@ class Group:
          Select a topic and add each photo to the media_list
         :return:
         """
-        media_raw,media_list = [],[]
-        cont = 0
+        # Non conta tutte le foto perchè ci sono album all'interno
+        # ogni foto di un album ha all'interno un attributo grouped_id con lo stesso valore.....
         async for message in self.telegram.client.iter_messages(self.telegram.channel.channel_id,
                                                                 limit=None,
                                                                 reverse=True,
@@ -32,23 +38,22 @@ class Group:
                                                                 reply_to=topic_id,
                                                                 min_id=0,
                                                                 max_id=0):
-            cont += 1
             if not message.sticker:
-                # Search
-                if message.photo:
+                if message.grouped_id or message.photo:
                     self.media = MyMedia()
                     self.media.msgid = message.id
+                    self.media_raw.append(self.media)
                     # Converting a timestamp to a datetime object
                     message_time = datetime.fromtimestamp(message.date.timestamp())
                     # Formatting the time into a string with the usual format
                     formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
                     # Setting the file name using the usual time format
                     self.media.title = f"{formatted_time}_{message.id}.jpg"
-                    media_raw.append(self.media)
-                    print(f"{[message.id]}[Found Photo n°{cont} in {topic_title}] --> {self.media.title}")
+                    print(self.media.title)
 
-        media_list = [media for media in media_raw if media.msgid]
-        return media_list
+        print(f"Found n° {len(self.media_raw)} Photo")
+
+        return [media for media in self.media_raw if media.msgid]
 
     async def forum_topics(self) -> list:
         """
@@ -74,5 +79,5 @@ class Group:
         print(".:LIST OF TOPICS:.")
         topic_ids = [[topic.id, topic.title] for topic in result.topics]
         for index, (topic_id, topic_title) in enumerate(sorted(topic_ids)):
-            print(f"[{index}] {topic_title}")
+            print(f"[{index}] {topic_title} {topic_id}")
         return sorted(topic_ids)
