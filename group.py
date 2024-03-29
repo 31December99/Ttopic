@@ -4,6 +4,8 @@ from mytelegram import MyTelegram
 from mymedia import MyMedia
 from telethon import functions, errors
 from datetime import datetime
+from telethon.tl.types import MessageMediaPhoto,MessageService,Message
+
 
 class Album:
 
@@ -29,9 +31,9 @@ class Group:
          Select a topic and add each photo to the media_list
         :return:
         """
-        async for message in self.telegram.client.iter_messages(self.telegram.channel.channel_id,
+        async for message in self.telegram.takeout.iter_messages(self.telegram.channel.channel_id,
                                                                 limit=None,
-                                                                reverse=True,
+                                                                reverse=False,
                                                                 wait_time=1,
                                                                 reply_to=topic_id,
                                                                 min_id=0,
