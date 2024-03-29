@@ -4,7 +4,6 @@ from mytelegram import MyTelegram
 from mymedia import MyMedia
 from telethon import functions, errors
 from datetime import datetime
-from telethon.tl.types import MessageMediaPhoto,MessageService,Message
 
 
 class Album:
@@ -32,12 +31,12 @@ class Group:
         :return:
         """
         async for message in self.telegram.takeout.iter_messages(self.telegram.channel.channel_id,
-                                                                limit=None,
-                                                                reverse=False,
-                                                                wait_time=1,
-                                                                reply_to=topic_id,
-                                                                min_id=0,
-                                                                max_id=0):
+                                                                 limit=None,
+                                                                 reverse=False,
+                                                                 wait_time=1,
+                                                                 reply_to=topic_id,
+                                                                 min_id=0,
+                                                                 max_id=0):
             if not message.sticker and not hasattr(message.media, 'document'):
                 if message.grouped_id or message.photo:
                     self.media = MyMedia()
