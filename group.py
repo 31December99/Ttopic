@@ -3,6 +3,7 @@
 from mytelegram import MyTelegram
 from mymedia import MyMedia
 from telethon import functions, errors
+from telethon.tl.types import MessageMediaWebPage
 from datetime import datetime
 
 
@@ -37,21 +38,34 @@ class Group:
                                                                  reply_to=topic_id,
                                                                  min_id=0,
                                                                  max_id=0):
-            if not message.sticker and not hasattr(message.media, 'document'):
+
+            # No sticker or webpage link
+            if not message.sticker and not isinstance(message.media, MessageMediaWebPage):
+                self.media = MyMedia()
+
+                # Converting a timestamp to a datetime object
+                message_time = datetime.fromtimestamp(message.date.timestamp())
+                # Formatting the time into a string with the usual format
+                formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
+                # Setting the file name using the usual time format
+
+                # Image file (Jpeg)
+                if hasattr(message.media, 'document'):
+                    if message.media.document.mime_type in ["image/jpeg"]:
+                        self.media.msgid = message.id
+                        self.media_raw.append(self.media)
+                        self.media.title = f"{formatted_time}_{message.id}.jpg"
+                        print(self.media.title)
+
+                # Photo album or single phot
                 if message.grouped_id or message.photo:
-                    self.media = MyMedia()
                     self.media.msgid = message.id
                     self.media_raw.append(self.media)
-                    # Converting a timestamp to a datetime object
-                    message_time = datetime.fromtimestamp(message.date.timestamp())
-                    # Formatting the time into a string with the usual format
-                    formatted_time = message_time.strftime("%Y-%m-%d %H-%M-%S")
-                    # Setting the file name using the usual time format
                     self.media.title = f"{formatted_time}_{message.id}.jpg"
                     print(self.media.title)
 
         print(f"Found n° {len(self.media_raw)} Photo")
-
+        # return ids list
         return [media for media in self.media_raw if media.msgid]
 
     async def forum_topics(self) -> list:
@@ -77,6 +91,6 @@ class Group:
 
         print(".:LIST OF TOPICS:.")
         topic_ids = [[topic.id, topic.title] for topic in result.topics]
-        for index, (topic_id, topic_title) in enumerate(sorted(topic_ids)):
+        for index, (topic_id, topic_title) in enumerate(topic_ids):
             print(f"[{index}] {topic_title} {topic_id}")
-        return sorted(topic_ids)
+        return topic_ids
