@@ -29,8 +29,6 @@ class Group:
          Select a topic and add each photo to the media_list
         :return:
         """
-        # Non conta tutte le foto perchè ci sono album all'interno
-        # ogni foto di un album ha all'interno un attributo grouped_id con lo stesso valore.....
         async for message in self.telegram.client.iter_messages(self.telegram.channel.channel_id,
                                                                 limit=None,
                                                                 reverse=True,
@@ -38,7 +36,7 @@ class Group:
                                                                 reply_to=topic_id,
                                                                 min_id=0,
                                                                 max_id=0):
-            if not message.sticker:
+            if not message.sticker and not hasattr(message.media, 'document'):
                 if message.grouped_id or message.photo:
                     self.media = MyMedia()
                     self.media.msgid = message.id
