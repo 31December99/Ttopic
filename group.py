@@ -26,7 +26,7 @@ class Group:
         print(f"-> [INVITE LINK] {self.telegram.INVITE_LINK}")
         print(f"-> [CHANNEL ID]  {self.telegram.channel.channel_id}")
 
-    async def topic(self, topic_id: int, topic_title: str):
+    async def topic(self, topic_id=None):
         """
          Select a topic and add each photo to the media_list
         :return:
