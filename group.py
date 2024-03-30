@@ -26,6 +26,19 @@ class Group:
         print(f"-> [INVITE LINK] {self.telegram.INVITE_LINK}")
         print(f"-> [CHANNEL ID]  {self.telegram.channel.channel_id}")
 
+    async def input(self) -> int:
+
+        # Get list of topics
+        topics = await self.forum_topics()
+
+        while True:
+            index = input(f"Choose which topic you want to check (0-{len(topics) - 1}): ")
+            if index.isnumeric():
+                topic_index = int(index)
+                if 0 <= topic_index <= len(topics) - 1:
+                    topic_id, topic_title = topics[topic_index]
+                    return topic_id
+
     async def topic(self, topic_id=None):
         """
          Select a topic and add each photo to the media_list
